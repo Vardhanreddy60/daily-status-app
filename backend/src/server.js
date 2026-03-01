@@ -3,12 +3,26 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const logRoutes = require("./routes/logs");
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:5000",
+  "https://daily-status-frontend.onrender.com"
+];
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/daily-status";
 
-app.use(cors({ origin: "http://localhost:5000", credentials: true }));
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true
+}));
 app.use(express.json());
 
 // ✅ Log every incoming request
